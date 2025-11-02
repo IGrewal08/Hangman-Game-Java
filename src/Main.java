@@ -1,28 +1,16 @@
-import java.util.*;
 import javax.swing.SwingUtilities;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 
-public class Main{
+public class Main {
 
-    public static Set<String> dictionary;
+    private static final Set<String> dictionary;
 
-    public static void main(String[] args) {
-    
-    setDictionary();
-
-    SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-            new HangmanGame();
-        }
-    });
-        
-    //build method to take all words in dictionary txt file and select words depending on chosen difficulty (words length)
-    }
-
-    public static void setDictionary() {
-
-        dictionary = new HashSet<>();
+    static {
+        dictionary = new HashSet<String>();
 
         try {
             Scanner scanner = new Scanner(new File("lib/dictionary.txt"));
@@ -33,20 +21,29 @@ public class Main{
             scanner.close();
 
         } catch (FileNotFoundException e) {
-            System.out.println("File not found Error");
+            System.err.println(e);
         }
-
     }
 
-    public static Set<String> getDictionary(int rand) {
-        Set<String> formatedDictionary = new HashSet<>();
+    public static void main(final String[] args) {
 
-        for (String s: dictionary) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new HangmanGame();
+            }
+        });
+    }
+
+    public static Set<String> getDictionary(final int rand) {
+        Set<String> formattedDictionary = new HashSet<>();
+
+        for (String s : dictionary) {
             if (s.length() == rand) {
-                formatedDictionary.add(s);
+                formattedDictionary.add(s);
             }
         }
 
-        return formatedDictionary; //this works
+        return formattedDictionary;
     }
 }

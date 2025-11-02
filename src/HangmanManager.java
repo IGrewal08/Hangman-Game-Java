@@ -4,26 +4,23 @@ public class HangmanManager {
 
     private static drawHangman draw;
 
-    //Stores all words depending on choosen difficulty
-    private Set<String> dictionary = new HashSet<>();
-    //Stores guessed letters
-    private static Set<Character> guessedLetters = new TreeSet<Character>();;
+    // Stores all words depending on chosen difficulty
+    private Set<String> dictionary;
+    // Stores guessed letters
+    private Set<Character> guessedLetters;
 
-    //Stores number of guesses left
+    // Stores number of guesses left
     private int guessesLeft = 6;
-    //Stores the length of the chosen words
+    // Stores the length of the chosen words
     private int wordLength;
-    //private int wordLength;
-
-    //stores current pattern
+    // stores current pattern
     public String pattern = "";
 
+    HangmanManager(final Set<String> dictionary, final int wordLength) {
 
-    HangmanManager(Set<String> dictionary, int wordLength) {
+        draw = new drawHangman();
 
-        HangmanManager.draw = new drawHangman();
-
-        this.dictionary = dictionary; //this works
+        this.dictionary = dictionary;
 
         String newPattern = "";
 
@@ -31,7 +28,7 @@ public class HangmanManager {
             newPattern += "- ";
         }
 
-        guessedLetters.clear();
+        guessedLetters = new TreeSet<Character>();
         guessesLeft = 6;
 
         this.pattern = newPattern;
@@ -41,15 +38,15 @@ public class HangmanManager {
 
     public drawHangman getDrawing() {
         return draw;
-    } 
+    }
 
-    //Returns the number of guesses the user has left
+    // Returns the number of guesses the user has left
     public int getGuessesLeft() {
         return guessesLeft;
 
     }
 
-    //Returns a Set of guessed letters
+    // Returns a Set of guessed letters
     public String getGuessedLetters() {
         if (guessedLetters.isEmpty()) {
             return "";
@@ -68,53 +65,50 @@ public class HangmanManager {
     }
 
     public Set<String> getDictionary() {
-        if (dictionary.isEmpty()) throw new IllegalAccessError("Empty Dictionary");
+        if (dictionary.isEmpty())
+            throw new IllegalAccessError("Empty Dictionary");
         return dictionary;
     }
 
-    public void update(char guess) {
-
+    public void update(final char guess) {
         Boolean doesExist = guessedLetters.contains(guess);
-
         String keyPattern = " ";
         int largestSet = 0;
+        Map<String, Set<String>> map = new HashMap<>();
 
         if (guessesLeft < 1 || dictionary.isEmpty())
             throw new IllegalStateException("Out of guesses or storage error", null);
-
-        Map<String, Set<String>> map = new HashMap<>();
 
         guessedLetters.add(guess);
 
         buildPattern(map);
 
-        for (String key: map.keySet()) {
+        for (String key : map.keySet()) {
             if (largestSet < (map.get(key)).size()) {
                 largestSet = (map.get(key)).size();
                 keyPattern = key;
             }
         }
 
-        if(!keyPattern.contains(String.valueOf(guess))) {
+        if (!keyPattern.contains(String.valueOf(guess))) {
             if (doesExist) {
             } else {
                 guessesLeft--;
             }
         }
-        
-        draw.setDraw(guessesLeft);
 
+        draw.setDraw(guessesLeft);
         dictionary.clear();
         dictionary.addAll(map.get(keyPattern));
-
         this.pattern = keyPattern;
-
     }
 
-    public void buildPattern(Map<String, Set<String>> map) {
-        String newPattern; //reset pattern for every word
+    public void buildPattern(final Map<String, Set<String>> map) {
+        if (map.isEmpty())
+            throw new NullPointerException("Pattern map is empty");
+        String newPattern;
 
-        for (String s: dictionary) {
+        for (String s : dictionary) {
             newPattern = "";
             for (int i = 0; i < wordLength; i++) {
                 if (guessedLetters.contains(s.charAt(i))) {
@@ -126,20 +120,21 @@ public class HangmanManager {
                 }
             }
             newPattern = newPattern.substring(1);
-            //Check if map has this pattern
+            // Check if map has this pattern
             if (!map.containsKey(newPattern)) {
                 Set<String> words = new HashSet<>();
-                //put element in map
+                // Put element in map
                 map.put(newPattern, words);
-                //add word to this new element
+                // Add word to this new element
                 map.get(newPattern).add(s);
 
-            //Map already has this patten
+                // Map already has this patten
             } else {
-                //Simply just add this word to element with matching pattern (our key in TreeMap)
+                // Simply just add this word to element with matching pattern (our key in
+                // TreeMap)
                 map.get(newPattern).add(s);
             }
         }
     }
-    
+
 }
